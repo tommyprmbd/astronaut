@@ -1,116 +1,87 @@
-<x-app-layout title="User">
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+            {{ __('User') }}
+        </h2>
+    </x-slot>
 
-    <h1>Add User</h1>
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+            <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
+                <div class="max-w-xl">
+                    <section>
+                        <header>
+                            <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
+                                {{ __('User Profile') }}
+                            </h2>
+                    
+                            <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                                {{ __('Ensure your account is using a long, random password to stay secure.') }}
+                            </p>
+                        </header>
+
+                        <form action="{{ route('user.store') }}" method="post" class="mt-4 text-gray-700 space-y-6">
+                            @csrf
     
-    <a href="{{ route('user.index') }}">List</a>
+                            <div>
+                                <x-input-label for="name" :value="__('Name')" />
+                                <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name')" required autofocus autocomplete="name" />
+                                <x-input-error class="mt-2" :messages="$errors->get('name')" />
+                            </div>
+    
+                            <div>
+                                <x-input-label for="email" :value="__('Email')" />
+                                <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email')" required autofocus autocomplete="email" />
+                                <x-input-error class="mt-2" :messages="$errors->get('email')" />
+                            </div>
+    
+                            <div>
+                                <x-input-label for="password" :value="__('New Password')" />
+                                <x-text-input id="password" name="password" type="password" class="mt-1 block w-full" autocomplete="new-password" />
+                                <x-input-error :messages="$errors->get('password')" class="mt-2" />
+                            </div>
+                    
+                            <div>
+                                <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
+                                <x-text-input id="password_confirmation" name="password_confirmation" type="password" class="mt-1 block w-full" autocomplete="new-password" />
+                                <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
+                            </div>
 
-    <form action="{{ route('user.store') }}" method="post">
-        @csrf
-        <table>
-            <tr>
-                <td>
-                    <label for="name">Name*</label>
-                </td>
-                <td>
-                    <input type="text" name="name" id="name" value="{{ old('name') }}" />
-                    @error('name')
-                        <small>{{ $message }}</small>
-                    @enderror
-                </td>
-            </tr>
+                            <header>
+                                <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
+                                    {{ __('Role') }}
+                                </h2>
+                        
+                                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                                    {{ __('Choose the role of this user.') }}
+                                </p>
+                            </header>
 
-            <tr>
-                <td>
-                    <label for="email">Email*</label>
-                </td>
-                <td>
-                    <input type="email" name="email" id="email" value="{{ old('email') }}" />
-                    @error('email')
-                        <small>{{ $message }}</small>
-                    @enderror
-                </td>
-            </tr>
+                            <div>
+                                <x-input-label for="role" :value="__('Role')" />
+                                <select name="role" id="role" class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm mt-1 block w-full">
+                                    <option value="" selected>{{ __('Choose') }}</option>
+                                    @foreach ($roles as $role)
+                                        @if (old('role') == $role)
+                                            <option value="{{ $role }}" selected>{{ $role }}</option>
+                                        @else
+                                            <option value="{{ $role }}">{{ $role }}</option>
+                                        @endif
+                                    @endforeach
+                                </select>
+                                <x-input-error :messages="$errors->get('role')" class="mt-2" />
+                            </div>
+                            
+                            <x-primary-button>{{ __('Create') }}</x-primary-button>
 
-            <tr>
-                <td>
-                    <label for="password">Password*</label>
-                </td>
-                <td>
-                    <input type="password" name="password" id="password" value="{{ old('password') }}" />
-                    @error('password')
-                        <small>{{ $message }}</small>
-                    @enderror
-                </td>
-            </tr>
-
-            <tr>
-                <td>
-                    <label for="password_confirmation">Retype Password*</label>
-                </td>
-                <td>
-                    <input type="password" name="password_confirmation" id="password_confirmation" value="{{ old('password_confirmation') }}" />
-                    @error('password_confirmation')
-                        <small>{{ $message }}</small>
-                    @enderror
-                </td>
-            </tr>
-
-            <tr>
-                <td>
-                    <label for="role">Role</label>
-                </td>
-                <td>
-                    <select name="role" id="role">
-                        <option selected>Choose</option>
-                        @foreach ($roles as $key => $role)
-                            @if (old('role') == $key)
-                                <option value="{{ $key }}" selected>{{ $role }}</option>
-                            @else
-                                <option value="{{ $key }}">{{ $role }}</option>
-                            @endif
-                        @endforeach
-                    </select>
-                </td>
-            </tr>
-
-            <tr>
-                <td>
-                    <label for="permissions">Permissions</label>
-                </td>
-                <td>
-                    @if (empty($permissions))
-                        Permission not found
-                    @else
-                        @foreach ($permissions as $group => $permission)
-                            <h3>{{ $group }}</h3>
-                            @foreach ($permission as $id => $item)
-                                @if (!empty(old('permissions')) && in_array($id, old('permissions')))
-                                    <input class="form-check-input" name="permissions[]" type="checkbox" value="{{ $id }}" id="{{ 'permission-' . $id }}" checked>
-                                @else
-                                    <input class="form-check-input" name="permissions[]" type="checkbox" value="{{ $id }}" id="{{ 'permission-' . $id }}">
-                                @endif
-                                    <label for="{{ 'permission-' . $id }}">
-                                        {{ $item['name'] }}
-                                    </label>
-                            @endforeach
-                        @endforeach
-                    @endif
-                </td>
-            </tr>
-
-            <tr>
-                <td></td>
-                <td>
-                    <button type="submit">Create</button>
-                    <a href="{{ route('user.index') }}">
-                        Cancel
-                    </a>
-                </td>
-            </tr>
-        </table>
+                            <x-cancel-button :route="route('user.index')">{{ __('Cancel') }}</x-cancel-button>
+                        </form>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
-
-    </form>
 
 </x-app-layout>

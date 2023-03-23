@@ -1,43 +1,47 @@
-<x-app-layout title="User">
-    
-    <h1>User</h1>
-    
-    <a href="{{ route('user.create') }}">Add</a>
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+            {{ __('User') }}
+        </h2>
+    </x-slot>
 
-    <table border="1">
-        <thead>
-            <tr>
-                <th>No.</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            @php
-                $no = 1;
-            @endphp
-            @if (count($users) > 0)
-                @foreach ($users as $user)
-                    <tr>
-                        <td>{{ $no++ }}.</td>
-                        <td>{{ $user->name }}</td>
-                        <td>{{ $user->email }}</td>
-                        <td>
-                            <a href="{{ route('user.edit', $user->id) }}">Edit</a>
-                            <form action="{{ route('user.destroy', $user->id) }}" method="post">
-                                @csrf
-                                <input type="hidden" name="_method" value="delete">
-                                <button type="submit">Delete</button>
-                            </form>
-                        </td>
-                    </tr>  
-                @endforeach
-            @else
-            <tr>
-                <td colspan="4">Data not found.</td>
-            </tr>
-            @endif
-        </tbody>
-    </table>
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg" style="padding-bottom: .745rem">
+                <div class="p-6 text-gray-900 dark:text-gray-100">
+                    
+                    <a href="{{ route('user.create') }}" class="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-500 rounded-md font-semibold text-xs text-gray-700 dark:text-gray-300 uppercase tracking-widest shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-25 transition ease-in-out duration-150">
+                        {{ __('Add') }}
+                    </a>
+
+                    <table class="table mt-4 shadow-sm text-gray-700" id="datatable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>
+                                    <i class="fa-solid fa-gear"></i>
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @push('script')
+    <script>
+        $('#datatable').DataTable( {
+            serverSide: true,
+            ajax: '{{ route("user.index") }}',
+            columns: [
+                { data: 'name', name: 'name' },
+                { data: 'email', name: 'email' },
+                { data: 'action', name: 'action', sortable: false, searchable: false },
+            ]
+        } );
+    </script>
+    @endpush
 </x-app-layout>

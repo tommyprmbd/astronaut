@@ -2,19 +2,14 @@
 namespace App\Services;
 
 use App\Models\User;
-use Exception;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
-class PermissionService
+class PermissionService extends BaseService
 {
     public static function groupListing($model = null): array
     {
-        // dd(get_class($model));
-        // if ($model && (!$model instanceof User || !$model instanceof Role))
-        //     return throw new Exception("Invalid class");
-
         $list = [];
 
         $permissions = Permission::orderBy('id')->pluck('name');
@@ -52,5 +47,21 @@ class PermissionService
         }
 
         return $list;
+    }
+
+    public function save(array $data, Permission $permission = null)
+    {
+        try {
+            if ($permission == null)
+                $permission = Permission::create($data);
+            else {
+                $permission->name = $data['name'];
+                $permission->save();
+            }
+        } catch (\Exception $e) {
+            return $e;
+        }
+
+        return true;
     }
 }

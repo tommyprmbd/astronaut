@@ -5,22 +5,39 @@ use App\Http\Requests\RoleRequest;
 use App\Services\PermissionService;
 use App\Services\RoleService;
 use Exception;
+use Illuminate\Http\Request;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Yajra\DataTables\DataTables;
 
 class RoleController extends Controller
 {
-    public function index(RoleService $service)
+    public function index(Request $request, RoleService $service)
     {
-        return view('role.index', [
+        if ($request->ajax()) {
+            $model = Role::all();
+
+            return DataTables::of($model)
+                ->addColumn('action', function ($model) {
+                    return view('astronaut.partial.action', [
+                        'model' => $model,
+                        'route' => 'role'
+                    ]);
+                })
+                ->rawColumns(['action'])
+                ->make(true);
+        }
+
+        return view('astronaut.role.index', [
             'roles' => $service->list(new Role())
         ]);
     }
 
     public function create()
     {
-        $permissions = PermissionService::groupListing();
+        $permissions = Permission::orderBy('name')->pluck('name');
         
-        return view('role.create', compact('permissions'));
+        return view('astronaut.role.create', compact('permissions'));
     }
 
     public function store(RoleRequest $request, RoleService $service)
@@ -34,9 +51,9 @@ class RoleController extends Controller
 
     public function edit(Role $role)
     {
-        $permissions = PermissionService::groupListing($role);
+        $permissions = Permission::orderBy('name')->pluck('name');
 
-        return view('role.edit', compact('role', 'permissions'));
+        return view('astronaut.role.edit', compact('role', 'permissions'));
     }
 
     public function update(Role $role, RoleRequest $request, RoleService $service)

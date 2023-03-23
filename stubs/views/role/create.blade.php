@@ -1,62 +1,59 @@
-<x-app-layout title="Role">
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+            {{ __('Role') }}
+        </h2>
+    </x-slot>
 
-    <h1>Add Role</h1>
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+            <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
+                <div class="max-w-xl">
+                    <section>
+                        <header>
+                            <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
+                                {{ __('Add Role') }}
+                            </h2>
+                        </header>
+
+                        <form action="{{ route('role.store') }}" method="post" class="mt-4 text-gray-700 space-y-6">
+                            @csrf
     
-    <a href="{{ route('role.index') }}">List</a>
+                            <div>
+                                <x-input-label for="name" :value="__('Name')" />
+                                <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name')" required autofocus autocomplete="name" />
+                                <x-input-error class="mt-2" :messages="$errors->get('name')" />
+                            </div>
 
-    <form action="{{ route('role.store') }}" method="post">
-        @csrf
-        <table>
-            <tr>
-                <td>
-                    <label for="name">Name*</label>
-                </td>
-                <td>
-                    <input type="text" name="name" id="name" value="{{ old('name') }}" />
-                    @error('name')
-                        <small>{{ $message }}</small>
-                    @enderror
-                </td>
-            </tr>
-
-            <tr>
-                <td>
-                    <label for="permissions">Permissions</label>
-                </td>
-                <td>
-                    @if (empty($permissions))
-                        Permission not found
-                    @else
-                        @foreach ($permissions as $group => $permission)
-                            <h3>{{ $group }}</h3>
-                            @foreach ($permission as $id => $item)
-                                @if (!empty(old('permissions')) && in_array($id, old('permissions')))
-                                    <input class="form-check-input" name="permissions[]" type="checkbox" value="{{ $id }}" id="{{ 'permission-' . $id }}" checked>
+                            <div>
+                                <x-input-label for="permission" :value="__('Permission')" />
+                                @if (empty($permissions))
+                                    {{ __('Permission not found') }}
                                 @else
-                                    <input class="form-check-input" name="permissions[]" type="checkbox" value="{{ $id }}" id="{{ 'permission-' . $id }}">
+                                    @foreach ($permissions as $name)
+                                        <div class="permission-item">
+                                        @if (!empty(old('permission')) && in_array($name, old('permission')))
+                                            <input class="form-check-input" name="permission[]" type="checkbox" value="{{ $name }}" id="{{ 'permission-' . $name }}" checked>
+                                        @else
+                                            <input class="form-check-input" name="permission[]" type="checkbox" value="{{ $name }}" id="{{ 'permission-' . $name }}">
+                                        @endif
+                                            <label for="{{ 'permission-' . $name }}">
+                                                {{ $name }}
+                                            </label>
+                                        </div>
+                                    @endforeach
                                 @endif
-                                    <label for="{{ 'permission-' . $id }}">
-                                        {{ $item['name'] }}
-                                    </label>
-                            @endforeach
-                        @endforeach
-                    @endif
-                </td>
-            </tr>
+                                <x-input-error class="mt-2" :messages="$errors->get('permission')" />
+                            </div>
+                            
+                            <x-primary-button>{{ __('Create') }}</x-primary-button>
 
-            <tr>
-                <td></td>
-                <td>
-                    <button type="submit">Create</button>
-                    <a href="{{ route('role.index') }}">
-                        Cancel
-                    </a>
-                </td>
-            </tr>
-        </table>
-
-
-
-    </form>
+                            <x-cancel-button :route="route('permission.index')">{{ __('Cancel') }}</x-cancel-button>
+                        </form>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </x-app-layout>

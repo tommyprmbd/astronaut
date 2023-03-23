@@ -17,8 +17,8 @@ class RoleService extends BaseService
                 $role->save();
             }
             
-            if (count($data['permissions']) > 0) {
-                $role->syncPermissions($data['permissions']);
+            if (count($data['permission']) > 0) {
+                $role->syncPermissions($data['permission']);
             }
         } catch (\Exception $e) {
             DB::rollBack();

@@ -3,16 +3,31 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UserRequest;
 use App\Models\User;
-use App\Services\PermissionService;
 use App\Services\UserService;
 use Exception;
+use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
+use Yajra\DataTables\DataTables;
 
 class UserController extends Controller
 {
-    public function index(UserService $service)
+    public function index(Request $request, UserService $service)
     {
-        return view('astronaut::user.index', [
+        if ($request->ajax()) {
+            $model = User::all();
+
+            return DataTables::of($model)
+                ->addColumn('action', function ($model) {
+                    return view('astronaut.partial.action', [
+                        'model' => $model,
+                        'route' => 'user'
+                    ]);
+                })
+                ->rawColumns(['action'])
+                ->make(true);
+        }
+
+        return view('astronaut.user.index', [
             'users' => $service->list(new User())
         ]);
     }
@@ -21,9 +36,7 @@ class UserController extends Controller
     {
         $roles = Role::pluck('name', 'id');
 
-        $permissions = PermissionService::groupListing();
-        
-        return view('user.create', compact('roles', 'permissions'));
+        return view('astronaut.user.create', compact('roles'));
     }
 
     public function store(UserRequest $request, UserService $service)
@@ -38,10 +51,8 @@ class UserController extends Controller
     public function edit(User $user)
     {
         $roles = Role::pluck('name', 'id');
-        
-        $permissions = PermissionService::groupListing($user);
 
-        return view('user.edit', compact('roles', 'permissions', 'user'));
+        return view('astronaut.user.edit', compact('roles', 'user'));
     }
 
     public function update(User $user, UserRequest $request, UserService $service)

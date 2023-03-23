@@ -34,10 +34,6 @@ class UserService extends BaseService
 
             if ($data['role'] != null) 
                 $user->syncRoles([$data['role']]);
-            
-            if (count($data['permissions']) > 0) {
-                $user->syncPermissions($data['permissions']);
-            }
 
         } catch (\Exception $e) {
             DB::rollBack();

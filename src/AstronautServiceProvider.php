@@ -17,6 +17,7 @@ class AstronautServiceProvider extends ServiceProvider implements DeferrableProv
 
         $this->commands([
             Console\InstallCommand::class,
+            Console\DevelopmentConsole::class,
         ]);
     }
 
